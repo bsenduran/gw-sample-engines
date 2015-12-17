@@ -24,20 +24,19 @@ import org.wso2.carbon.messaging.CarbonMessageProcessor;
 import org.wso2.carbon.messaging.DefaultCarbonMessage;
 import org.wso2.carbon.messaging.TransportSender;
 
-import java.nio.charset.Charset;
-
-
 public class EchoEngine implements CarbonMessageProcessor {
     public boolean receive(CarbonMessage carbonMessage, CarbonCallback carbonCallback) throws Exception {
 
         DefaultCarbonMessage echoResponse = new DefaultCarbonMessage();
 
-        String greeting = "Hello World\n";
-        byte[] bytes = greeting.getBytes(Charset.defaultCharset());
-
-
-        echoResponse.setStringMessageBody(greeting);
-        echoResponse.setHeader("Content-Length", String.valueOf(bytes.length));
+        while (true) {
+            echoResponse.addMessageBody(carbonMessage.getMessageBody());
+            if (carbonMessage.isEomAdded() && carbonMessage.isEomAdded()) {
+                echoResponse.setEomAdded(true);
+                break;
+            }
+        }
+        echoResponse.setHeader("Content-Length", carbonMessage.getHeader("Content-Length"));
 
         carbonCallback.done(echoResponse);
         return true;

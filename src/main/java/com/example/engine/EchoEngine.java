@@ -18,36 +18,26 @@
 
 package com.example.engine;
 
-import org.wso2.carbon.messaging.*;
+import org.wso2.carbon.messaging.CarbonCallback;
+import org.wso2.carbon.messaging.CarbonMessage;
+import org.wso2.carbon.messaging.CarbonMessageProcessor;
+import org.wso2.carbon.messaging.DefaultCarbonMessage;
+import org.wso2.carbon.messaging.TransportSender;
 
 import java.nio.charset.Charset;
-
-/**
- * Created by senduran on 12/9/15.
- */
 
 
 public class EchoEngine implements CarbonMessageProcessor {
     public boolean receive(CarbonMessage carbonMessage, CarbonCallback carbonCallback) throws Exception {
 
         DefaultCarbonMessage echoResponse = new DefaultCarbonMessage();
-        String greeting = "Hello World\n";
 
+        String greeting = "Hello World\n";
         byte[] bytes = greeting.getBytes(Charset.defaultCharset());
 
 
-        echoResponse.setProperty("HTTP_STATUS_CODE", 200);
         echoResponse.setStringMessageBody(greeting);
         echoResponse.setHeader("Content-Length", String.valueOf(bytes.length));
-
-
-//        while (true) {
-//            echoResponse.addMessageBody(carbonMessage.getMessageBody());
-//            if(carbonMessage.isEomAdded() && carbonMessage.isEmpty()) {
-//                echoResponse.setEomAdded(true);
-//                break;
-//            }
-//        }
 
         carbonCallback.done(echoResponse);
         return true;

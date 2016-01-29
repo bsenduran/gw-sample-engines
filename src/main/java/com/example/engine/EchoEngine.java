@@ -30,40 +30,35 @@ public class EchoEngine implements CarbonMessageProcessor {
 
     public boolean receive(CarbonMessage carbonMessage, final CarbonCallback carbonCallback) throws Exception {
 
-        final DefaultCarbonMessage echoRequest = new DefaultCarbonMessage();
+        String routeId = carbonMessage.getHeader("routeId") == null ? "" : carbonMessage.getHeader("routeId");
 
-        while (true) {
-            echoRequest.addMessageBody(carbonMessage.getMessageBody());
-            if (carbonMessage.isEomAdded() && carbonMessage.isEmpty()) {
-                echoRequest.setEomAdded(true);
-                break;
-            }
+        switch (routeId) {
+
+        case "r1":
+            carbonMessage.setProperty(Constants.TO, "/services/SimpleStockQuoteService");
+            carbonMessage.setProperty(Constants.HOST, "localhost");
+            carbonMessage.setProperty(Constants.PORT, 9000);
+            break;
+
+        case "r2":
+            carbonMessage.setProperty(Constants.TO, "/services/SimpleStockQuoteService");
+            carbonMessage.setProperty(Constants.HOST, "localhost");
+            carbonMessage.setProperty(Constants.PORT, 9001);
+            break;
+
+        default:
+            carbonMessage.setProperty(Constants.TO, "/services/SimpleStockQuoteService");
+            carbonMessage.setProperty(Constants.HOST, "localhost");
+            carbonMessage.setProperty(Constants.PORT, 9004);
+
+            break;
+
         }
 
-        carbonMessage.getProperties().forEach(echoRequest::setProperty);
-        carbonMessage.getHeaders().forEach(echoRequest::setHeader);
-
-        echoRequest.setProperty(Constants.TO, "/services/SimpleStockQuoteService");
-        echoRequest.setProperty(Constants.HOST, "localhost");
-        echoRequest.setProperty(Constants.PORT, 9000);
-
-        sender.send(echoRequest, new CarbonCallback() {
+        sender.send(carbonMessage, new CarbonCallback() {
             @Override
             public void done(CarbonMessage cMsg) {
-                DefaultCarbonMessage defaultResponse = new DefaultCarbonMessage();
-
-                while (true) {
-                    defaultResponse.addMessageBody(cMsg.getMessageBody());
-                    if (cMsg.isEomAdded() && cMsg.isEmpty()) {
-                        defaultResponse.setEomAdded(true);
-                        break;
-                    }
-                }
-
-                cMsg.getHeaders().forEach(defaultResponse::setHeader);
-                defaultResponse.setHeader("hello", "world");
-                cMsg.getProperties().forEach(defaultResponse::setProperty);
-                carbonCallback.done(defaultResponse);
+                carbonCallback.done(cMsg);
             }
         });
 

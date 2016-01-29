@@ -25,18 +25,21 @@ import org.wso2.carbon.messaging.DefaultCarbonMessage;
 import org.wso2.carbon.messaging.TransportSender;
 
 public class EchoEngine implements CarbonMessageProcessor {
-    public boolean receive(CarbonMessage carbonMessage, CarbonCallback carbonCallback) throws Exception {
+
+    public boolean receive(CarbonMessage carbonMessage, final CarbonCallback carbonCallback) throws Exception {
 
         DefaultCarbonMessage echoResponse = new DefaultCarbonMessage();
 
         while (true) {
             echoResponse.addMessageBody(carbonMessage.getMessageBody());
-            if (carbonMessage.isEomAdded() && carbonMessage.isEomAdded()) {
+            if (carbonMessage.isEomAdded() && carbonMessage.isEmpty()) {
                 echoResponse.setEomAdded(true);
                 break;
             }
         }
-        echoResponse.setHeader("Content-Length", carbonMessage.getHeader("Content-Length"));
+
+        carbonMessage.getProperties().forEach(echoResponse::setProperty);
+        carbonMessage.getHeaders().forEach(echoResponse::setHeader);
 
         carbonCallback.done(echoResponse);
         return true;

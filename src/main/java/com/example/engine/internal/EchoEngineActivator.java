@@ -23,8 +23,6 @@ import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.wso2.carbon.messaging.CarbonMessageProcessor;
 
-
-
 public class EchoEngineActivator implements BundleActivator {
     public void start(BundleContext bundleContext) throws Exception {
         bundleContext.registerService(CarbonMessageProcessor.class, new EchoEngine(), null);

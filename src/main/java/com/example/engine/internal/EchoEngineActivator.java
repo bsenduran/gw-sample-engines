@@ -25,7 +25,9 @@ import org.wso2.carbon.messaging.CarbonMessageProcessor;
 
 public class EchoEngineActivator implements BundleActivator {
     public void start(BundleContext bundleContext) throws Exception {
-        bundleContext.registerService(CarbonMessageProcessor.class, new EchoEngine(), null);
+        CarbonMessageProcessor echoEngine = new EchoEngine();
+        bundleContext.registerService(CarbonMessageProcessor.class, echoEngine, null);
+        EchoContextHolder.getInstance().setEngine(echoEngine);
     }
 
     public void stop(BundleContext bundleContext) throws Exception {

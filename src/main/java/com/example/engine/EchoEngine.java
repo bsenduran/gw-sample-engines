@@ -21,32 +21,57 @@ package com.example.engine;
 import org.wso2.carbon.messaging.CarbonCallback;
 import org.wso2.carbon.messaging.CarbonMessage;
 import org.wso2.carbon.messaging.CarbonMessageProcessor;
+import org.wso2.carbon.messaging.Constants;
 import org.wso2.carbon.messaging.DefaultCarbonMessage;
 import org.wso2.carbon.messaging.TransportSender;
 
 public class EchoEngine implements CarbonMessageProcessor {
+    TransportSender sender;
 
     public boolean receive(CarbonMessage carbonMessage, final CarbonCallback carbonCallback) throws Exception {
 
-        DefaultCarbonMessage echoResponse = new DefaultCarbonMessage();
+        final DefaultCarbonMessage echoRequest = new DefaultCarbonMessage();
 
         while (true) {
-            echoResponse.addMessageBody(carbonMessage.getMessageBody());
+            echoRequest.addMessageBody(carbonMessage.getMessageBody());
             if (carbonMessage.isEomAdded() && carbonMessage.isEmpty()) {
-                echoResponse.setEomAdded(true);
+                echoRequest.setEomAdded(true);
                 break;
             }
         }
 
-        carbonMessage.getProperties().forEach(echoResponse::setProperty);
-        carbonMessage.getHeaders().forEach(echoResponse::setHeader);
+        carbonMessage.getProperties().forEach(echoRequest::setProperty);
+        carbonMessage.getHeaders().forEach(echoRequest::setHeader);
 
-        carbonCallback.done(echoResponse);
+        echoRequest.setProperty(Constants.TO, "/services/SimpleStockQuoteService");
+        echoRequest.setProperty(Constants.HOST, "localhost");
+        echoRequest.setProperty(Constants.PORT, 9000);
+
+        sender.send(echoRequest, new CarbonCallback() {
+            @Override
+            public void done(CarbonMessage cMsg) {
+                DefaultCarbonMessage defaultResponse = new DefaultCarbonMessage();
+
+                while (true) {
+                    defaultResponse.addMessageBody(cMsg.getMessageBody());
+                    if (cMsg.isEomAdded() && cMsg.isEmpty()) {
+                        defaultResponse.setEomAdded(true);
+                        break;
+                    }
+                }
+
+                cMsg.getHeaders().forEach(defaultResponse::setHeader);
+                defaultResponse.setHeader("hello", "world");
+                cMsg.getProperties().forEach(defaultResponse::setProperty);
+                carbonCallback.done(defaultResponse);
+            }
+        });
+
         return true;
     }
 
     public void setTransportSender(TransportSender transportSender) {
-
+        sender = transportSender;
     }
 
     @Override

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package com.example.engine;
+package org.wso2.gw.sample.echo;
 
 import org.wso2.carbon.messaging.CarbonCallback;
 import org.wso2.carbon.messaging.CarbonMessage;
@@ -24,7 +24,7 @@ import org.wso2.carbon.messaging.CarbonMessageProcessor;
 import org.wso2.carbon.messaging.DefaultCarbonMessage;
 import org.wso2.carbon.messaging.TransportSender;
 
-public class EchoEngine implements CarbonMessageProcessor {
+public class Engine implements CarbonMessageProcessor {
 
     public boolean receive(CarbonMessage carbonMessage, final CarbonCallback carbonCallback) throws Exception {
 
@@ -32,8 +32,8 @@ public class EchoEngine implements CarbonMessageProcessor {
 
         while (true) {
             echoResponse.addMessageBody(carbonMessage.getMessageBody());
-            if (carbonMessage.isEomAdded() && carbonMessage.isEmpty()) {
-                echoResponse.setEomAdded(true);
+            if (carbonMessage.isEndOfMsgAdded() && carbonMessage.isEmpty()) {
+                echoResponse.setEndOfMsgAdded(true);
                 break;
             }
         }

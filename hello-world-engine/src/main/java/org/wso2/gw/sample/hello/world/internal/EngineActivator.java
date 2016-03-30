@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -16,16 +16,17 @@
  * under the License.
  */
 
-package com.example.engine.internal;
+package org.wso2.gw.sample.hello.world.internal;
 
-import com.example.engine.EchoEngine;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.wso2.carbon.messaging.CarbonMessageProcessor;
+import org.wso2.gw.sample.hello.world.Engine;
 
-public class EchoEngineActivator implements BundleActivator {
+public class EngineActivator implements BundleActivator {
     public void start(BundleContext bundleContext) throws Exception {
-        bundleContext.registerService(CarbonMessageProcessor.class, new EchoEngine(), null);
+        CarbonMessageProcessor helloWorldEngine = new Engine();
+        bundleContext.registerService(CarbonMessageProcessor.class, helloWorldEngine, null);
     }
 
     public void stop(BundleContext bundleContext) throws Exception {
